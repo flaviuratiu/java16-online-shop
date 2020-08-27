@@ -1,6 +1,7 @@
 package org.fasttrackit.onlineshop.service;
 
 import org.fasttrackit.onlineshop.domain.User;
+import org.fasttrackit.onlineshop.exception.ResourceNotFoundException;
 import org.fasttrackit.onlineshop.persistence.UserRepository;
 import org.fasttrackit.onlineshop.transfer.SaveUserRequest;
 import org.slf4j.Logger;
@@ -33,4 +34,21 @@ public class UserService {
 
         return userRepository.save(user);
     }
+
+    public User getUser(long id) {
+        LOGGER.info("Retrieving user {}", id);
+
+        // optional example
+//        Optional<User> userOptional = userRepository.findById(id);
+//        if (userOptional.isPresent()) {
+//            return userOptional.get();
+//        } else {
+//            throw new ResourceNotFoundException("User " + id + " does not exist");
+//        }
+
+        return userRepository.findById(id)
+                // lambda expression
+                .orElseThrow(() -> new ResourceNotFoundException("User " + id + " does not exist"));
+    }
+
 }
