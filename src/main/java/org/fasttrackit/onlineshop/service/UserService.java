@@ -6,8 +6,11 @@ import org.fasttrackit.onlineshop.persistence.UserRepository;
 import org.fasttrackit.onlineshop.transfer.SaveUserRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
 
 // spring bean (object controlled by Spring Boot)
 // IoC Container (context of all spring beans)
@@ -31,6 +34,7 @@ public class UserService {
         User user = new User();
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
+        user.setCreatedDate(Instant.now());
 
         return userRepository.save(user);
     }
@@ -49,6 +53,21 @@ public class UserService {
         return userRepository.findById(id)
                 // lambda expression
                 .orElseThrow(() -> new ResourceNotFoundException("User " + id + " does not exist"));
+    }
+
+    public User updateUser(long id, SaveUserRequest request) {
+        LOGGER.info("Updating user {}: {}", id, request);
+
+        User existingUser = getUser(id);
+
+        BeanUtils.copyProperties(request, existingUser);
+
+        return userRepository.save(existingUser);
+    }
+
+    public void deleteUser(long id) {
+        LOGGER.info("Deleting user {}", id);
+        userRepository.deleteById(id);
     }
 
 }
